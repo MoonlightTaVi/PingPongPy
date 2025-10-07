@@ -43,6 +43,3 @@ class PingPong:
             left: str = "*" * state
             right: str = "*" * (width - state)
             print("[" + left + "O" + right + "]", end='\r')
-
-
-#PingPong().play()

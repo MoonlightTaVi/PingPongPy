@@ -1,12 +1,10 @@
 import tkinter as tk
 import webbrowser
-import util.properties as properties
 
 
-properties.load()
-COPY_TEXT: str = properties.get("PASSWORD")
-URL: str = properties.get("URL")
-BUFFER_LIFETIME: int = int(properties.get("BUFFER_LIFETIME"))
+COPY_TEXT: str = "admin"
+URL: str = "http://192.168.0.1/"
+BUFFER_LIFETIME: int = 300
 
 
 def copy_to_clipboad(text: str = COPY_TEXT):
@@ -24,7 +22,7 @@ def open_browser(url: str = URL):
     webbrowser.open(url)
 
 
-def run():
+def start():
     """Copy router password and open in browser."""
     copy_to_clipboad()
     open_browser()
@@ -32,4 +30,4 @@ def run():
 
 ### Launch on click
 if __name__ == "__main__":
-    run()
+    start()
