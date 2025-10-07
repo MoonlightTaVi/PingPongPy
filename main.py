@@ -42,7 +42,7 @@ if __name__ == "__main__":
     SLEEP_TIME = float(properties.get("SLEEP_TIME"))
     UPDATE_TIME = float(properties.get("ANIMATION_UPDATE_TIME"))
     ASCII_ENABLED = properties.get_bool("ASCII_ENABLED")
-    MAX_FAILS = int(properties.get_bool("MAX_FAILS"))
+    MAX_FAILS = int(properties.get("MAX_FAILS"))
     OPEN_ON_START: bool = properties.get_bool("OPEN_ON_START")
     ascii.load(ASCII_FILE)
     if OPEN_ON_START:
