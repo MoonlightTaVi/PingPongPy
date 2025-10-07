@@ -11,6 +11,25 @@ ASCII_FILE: str = "ascii_fu.txt"
 UPDATE_TIME: float = 20
 ASCII_ENABLED: bool = True
 MAX_FAILS: int = 5
+OPEN_BROWSER: bool = properties.get_bool("OPEN_BROWSER")
+
+
+def ask_agreement() -> bool:
+    inp: str = input("(Y/N) ").lower()
+    while not inp in ['y', 'n']:
+        inp = input("(Y/N) ").lower()
+    return inp == 'y'
+
+def should_open_page() -> bool:
+    global OPEN_BROWSER
+    print("Do you wish to open router page right now?")
+    if not ask_agreement():
+        print("Would you like me to open this page on disconnect (later)?")
+        if not ask_agreement():
+            OPEN_BROWSER = False
+        return False
+    return True
+
 
 def main():
     stopwatch = Stopwatch()
@@ -27,7 +46,7 @@ def main():
             print(f"{ping.URL} is unreachable. ({stopwatch.click()}s)")
             if ASCII_ENABLED:
                 ascii.draw(ASCII_FILE)
-            if state.fail():
+            if state.fail() and OPEN_BROWSER:
                 myrouter.start()
         pong.play(SLEEP_TIME)
 
@@ -43,8 +62,7 @@ if __name__ == "__main__":
     UPDATE_TIME = float(properties.get("ANIMATION_UPDATE_TIME"))
     ASCII_ENABLED = properties.get_bool("ASCII_ENABLED")
     MAX_FAILS = int(properties.get("MAX_FAILS"))
-    OPEN_ON_START: bool = properties.get_bool("OPEN_ON_START")
     ascii.load(ASCII_FILE)
-    if OPEN_ON_START:
+    if should_open_page():
         myrouter.start()
     main()
