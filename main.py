@@ -11,7 +11,7 @@ ASCII_FILE: str = "ascii_fu.txt"
 UPDATE_TIME: float = 20
 ASCII_ENABLED: bool = True
 MAX_FAILS: int = 5
-OPEN_BROWSER: bool = properties.get_bool("OPEN_BROWSER")
+OPEN_BROWSER: bool = True
 
 
 def ask_agreement() -> bool:
@@ -62,6 +62,7 @@ if __name__ == "__main__":
     UPDATE_TIME = float(properties.get("ANIMATION_UPDATE_TIME"))
     ASCII_ENABLED = properties.get_bool("ASCII_ENABLED")
     MAX_FAILS = int(properties.get("MAX_FAILS"))
+    OPEN_BROWSER = properties.get_bool("OPEN_BROWSER")
     ascii.load(ASCII_FILE)
     if should_open_page():
         myrouter.start()
