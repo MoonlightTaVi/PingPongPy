@@ -69,5 +69,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("[Safe shuttown]")
+        print("[Shutdown]")
         input("Press any key to quit...")
