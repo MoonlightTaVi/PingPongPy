@@ -66,4 +66,8 @@ if __name__ == "__main__":
     ascii.load(ASCII_FILE)
     if should_open_page():
         myrouter.start()
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("[Safe shuttown]")
+        input("Press any key to quit...")
