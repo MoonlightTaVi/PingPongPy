@@ -18,10 +18,13 @@ import util.properties as properties
 import util.ascii as ascii
 import src.ping as ping
 import src.myrouter as myrouter
+from src.shell import Reboot
 from util.animation import PingPong
 from util.timer import Stopwatch
 from util.state import State
 
+
+reboot = Reboot()
 
 SLEEP_TIME: float = 5
 FAIL_SLEEP_TIME: float = 5
@@ -30,6 +33,7 @@ UPDATE_TIME: float = 20
 ASCII_ENABLED: bool = True
 MAX_FAILS: int = 5
 OPEN_BROWSER: bool = True
+REBOOT: bool = False
 PING_URL: str = "google.com"
 
 
@@ -70,8 +74,11 @@ def main():
             print(f"{ping.URL} is unreachable. ({stopwatch.click()}s)")
             if ASCII_ENABLED:
                 ascii.draw(ASCII_FILE)
-            if state.fail() and OPEN_BROWSER:
-                myrouter.start()
+            if state.fail():
+                if OPEN_BROWSER:
+                    myrouter.start()
+                elif REBOOT:
+                    reboot.exec()
         sleep = SLEEP_TIME if state.fail_count == 0 else FAIL_SLEEP_TIME
         pong.play(sleep)
 
@@ -99,6 +106,13 @@ if __name__ == "__main__":
     FAIL_SLEEP_TIME = config.getfloat("PREFERENCES", "fail_sleep")
     MAX_FAILS = config.getint("PREFERENCES","max_fail")
     OPEN_BROWSER = config.getboolean("PREFERENCES", "open_browser")
+
+    reboot.username = config["API"]["username"]
+    reboot.password = config["API"]["password"]
+    reboot.url = config["API"]["URL"]
+    reboot.endpoint = config["API"]["endpoint"]
+    REBOOT = config.getboolean("API", "reboot")
+
     ascii.load(ASCII_FILE)
     show_logo()
     try:
