@@ -96,12 +96,16 @@ if __name__ == "__main__":
     PING_URL = config["WEB"]["server"]
     ping.URL = PING_URL
     ping.TIMEOUT = config.getfloat("WEB", "TIMEOUT")
+
     myrouter.COPY_TEXT = config["API"]["password"]
     myrouter.URL = config["API"]["URL"]
+
     myrouter.BUFFER_LIFETIME = config.getint("OTHER","buffer_delay")
+
     UPDATE_TIME = config.getfloat("DISPLAY", "animation_rate")
     ASCII_ENABLED = config.getboolean("DISPLAY", "ascii_enabled")
     ASCII_FILE = config["DISPLAY"]["ascii_file"]
+
     SLEEP_TIME = config.getfloat("PREFERENCES", "sleep")
     FAIL_SLEEP_TIME = config.getfloat("PREFERENCES", "fail_sleep")
     MAX_FAILS = config.getint("PREFERENCES","max_fail")

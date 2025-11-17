@@ -1,4 +1,5 @@
 import os
+import time
 
 
 class Reboot:
@@ -17,7 +18,9 @@ class Reboot:
         return f'{self.username}:{self.password}'
     def get_command(self) -> str:
         """Returns command (tested on Windows)."""
-        return f'curl -s -o nul -w "{self.message}" --anyauth --user {self.get_auth()} -H "Referer: {self.url}" {self.full_url()}'
+        return f'curl -s -o nul --anyauth --user {self.get_auth()} -H "Referer: {self.url}" {self.full_url()}'
     def exec(self):
-        """Reboots the router."""
+        """Reboots the router and pauses the application."""
+        print(self.message)
         os.system(self.get_command())
+        time.sleep(10)
