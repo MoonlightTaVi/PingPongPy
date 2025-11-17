@@ -10,7 +10,7 @@ to quickly log in and reboot.
 The "optional" and "some" settings may be changed
 from the application.properties file.
 """
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "MoonlightTaVi"
 
 
@@ -24,6 +24,7 @@ from util.state import State
 
 
 SLEEP_TIME: float = 5
+FAIL_SLEEP_TIME: float = 5
 ASCII_FILE: str = "ascii_fu.txt"
 UPDATE_TIME: float = 20
 ASCII_ENABLED: bool = True
@@ -40,12 +41,17 @@ def ask_agreement() -> bool:
 
 def should_open_page() -> bool:
     global OPEN_BROWSER
+    # If configured to not open in settings
+    if not OPEN_BROWSER:
+        return False
+    
     print("Do you wish to open router page right now?")
     if not ask_agreement():
         print("Would you like me to open this page on disconnect (later)?")
         if not ask_agreement():
             OPEN_BROWSER = False
         return False
+    
     return True
 
 
@@ -66,7 +72,8 @@ def main():
                 ascii.draw(ASCII_FILE)
             if state.fail() and OPEN_BROWSER:
                 myrouter.start()
-        pong.play(SLEEP_TIME)
+        sleep = SLEEP_TIME if state.fail_count == 0 else FAIL_SLEEP_TIME
+        pong.play(sleep)
 
 def show_logo():
     print('#' * 50)
@@ -78,18 +85,20 @@ def show_logo():
 
 
 if __name__ == "__main__":
-    properties.load()
-    PING_URL = properties.get("PING_URL")
+    config = properties.load_config()
+    PING_URL = config["WEB"]["server"]
     ping.URL = PING_URL
-    ping.TIMEOUT = float(properties.get("TIMEOUT"))
-    myrouter.COPY_TEXT = properties.get("PASSWORD")
-    myrouter.URL = properties.get("URL")
-    myrouter.BUFFER_LIFETIME = int(properties.get("BUFFER_LIFETIME"))
-    SLEEP_TIME = float(properties.get("SLEEP_TIME"))
-    UPDATE_TIME = float(properties.get("ANIMATION_UPDATE_TIME"))
-    ASCII_ENABLED = properties.get_bool("ASCII_ENABLED")
-    MAX_FAILS = int(properties.get("MAX_FAILS"))
-    OPEN_BROWSER = properties.get_bool("OPEN_BROWSER")
+    ping.TIMEOUT = config.getfloat("WEB", "TIMEOUT")
+    myrouter.COPY_TEXT = config["API"]["password"]
+    myrouter.URL = config["API"]["URL"]
+    myrouter.BUFFER_LIFETIME = config.getint("OTHER","buffer_delay")
+    UPDATE_TIME = config.getfloat("DISPLAY", "animation_rate")
+    ASCII_ENABLED = config.getboolean("DISPLAY", "ascii_enabled")
+    ASCII_FILE = config["DISPLAY"]["ascii_file"]
+    SLEEP_TIME = config.getfloat("PREFERENCES", "sleep")
+    FAIL_SLEEP_TIME = config.getfloat("PREFERENCES", "fail_sleep")
+    MAX_FAILS = config.getint("PREFERENCES","max_fail")
+    OPEN_BROWSER = config.getboolean("PREFERENCES", "open_browser")
     ascii.load(ASCII_FILE)
     show_logo()
     try:
