@@ -5,7 +5,7 @@ class State:
     max_fails: int = 5
     # Do not open browser if already opened
     # Do not open unless succeeded at least once after startup
-    needs_reset: bool = True
+    needs_reset: bool = False
     def fail(self) -> bool:
         self.fail_count += 1
         if self.fail_count >= self.max_fails and not self.needs_reset:
