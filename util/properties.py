@@ -12,6 +12,8 @@ def load() -> dict:
     Reads application.properties and returns dict of
     property pairs (key:value).
     If the properties are already loaded, just returns them.
+
+    Deprecated.
     """
     global pairs
     if len(pairs) > 0:
@@ -43,6 +45,8 @@ def get(key: str, default_value: str = "") -> str:
     """
     Get value, assigned to the key,
     if it exists. Otherwise default value.
+
+    Deprecated.
     """
     if not key in pairs:
         return default_value
@@ -52,6 +56,8 @@ def get_bool(key: str) -> bool:
     """
     Get value, assigned to the key,
     if it exists. Otherwise default value.
+    
+    Deprecated.
     """
     bool_str: str = get(key,"false")
     return bool_str.lower() == "true"
