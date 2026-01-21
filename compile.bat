@@ -1,1 +1,1 @@
-pyinstaller --onefile main.py --icon=ping.ico
+pyinstaller --onefile src/main.py --icon=ping.ico --name=pong
