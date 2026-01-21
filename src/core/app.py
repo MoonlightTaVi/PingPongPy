@@ -2,7 +2,7 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "MoonlightTaVi"
 
 
@@ -87,6 +87,7 @@ class PingPong:
         self.reboot.load_config(parser)
         self.ascii.load(self.config.ASCII_FILE)
         self.pong.update_time = self.config.UPDATE_TIME
+        self.state.max_fails = parser.getint('PREFERENCES', 'max_fail')
 
     def run(self):
         """
@@ -115,7 +116,7 @@ class PingPong:
                 elif self.config.REBOOT:
                     self.reboot.exec()
             # Ask to reboot manually or quit
-            else:
+            elif self.state.connection_lost():
                 self.idle_mode()
         
         sleep: float
