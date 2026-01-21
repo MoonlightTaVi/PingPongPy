@@ -24,7 +24,7 @@ directories: list = [
     "./dist",
     "./build"
 ]
-files: list = ["main.spec"]
+files: list = ["main.spec", "ping.spec", "pong.spec"]
 
 
 if __name__ == "__main__":
@@ -34,4 +34,4 @@ if __name__ == "__main__":
         delete_file(file)
 
     print("Clean-up finished.")
-    input("Press any key to quit...")
+    input("Press Enter to quit...")
