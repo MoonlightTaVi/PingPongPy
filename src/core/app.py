@@ -2,13 +2,14 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "MoonlightTaVi"
 
 
 from configparser import ConfigParser
 
 from .util.art import PingPongAnim, AsciiDrawer
+from .util import messages
 from .util.metrics import Stopwatch
 from .tools.browser import BrowserPage
 from .tools.health import PingSubprocess
@@ -26,11 +27,12 @@ class State:
         # Do not open unless succeeded at least once after startup
         self.needs_reset: bool = False
 
-    def fail(self) -> bool:
+    def can_reboot(self) -> bool:
         """
         Counts a single internet connection check failure.
-        Returns true if have failed too many times, and the router must be
-        rebooted. False otherwise (it may be a micro-disconnect).
+        Returns true if have failed a few times, and the router must be
+        rebooted. False otherwise 
+        (it may be a micro-disconnect or a complete connection loss).
         """
         self.fail_count += 1
         if self.fail_count >= self.max_fails and not self.needs_reset:
@@ -45,6 +47,13 @@ class State:
         """
         self.fail_count = 0
         self.needs_reset = False
+    
+    def connection_lost(self):
+        """
+        Returns true if the remote server 
+        does not respond for a long time.
+        """
+        return self.fail_count >= self.max_fails * 2
 
 
 class PingPong:
@@ -99,11 +108,15 @@ class PingPong:
             if self.config.ASCII_ENABLED:
                 self.ascii.draw(self.config.ASCII_FILE)
             
-            if self.state.fail():
+            # Try rebooting automatically
+            if self.state.can_reboot():
                 if self.config.OPEN_BROWSER:
                     self.browser.start()
                 elif self.config.REBOOT:
                     self.reboot.exec()
+            # Ask to reboot manually or quit
+            else:
+                self.idle_mode()
         
         sleep: float
         if self.state.fail_count == 0:
@@ -112,3 +125,30 @@ class PingPong:
             sleep = self.config.FAIL_SLEEP_TIME
         
         self.pong.play(sleep)
+    
+    def idle_mode(self):
+        """
+        Enters the idle mode, where the user is asked to reboot the router
+        manually or quit the application.
+        The 'while True' will end once the connection is re-established.
+        """
+
+        print("It seems that the connection has been lost")
+        print(" and cannot be recovered.")
+        print("From now on, you need to either reboot the router manually")
+        print(" or just give up.")
+
+        connection_established = False
+        while not connection_established:
+            # Reboot
+            if messages.ask("Do you want to reboot again?"):
+                self.reboot.exec()
+                if not self.process.ping():
+                    # Keep rebooting
+                    continue
+            # Give up
+            else:
+                quit()
+
+            # The internet connection is fixed
+            connection_established = True
