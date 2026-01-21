@@ -2,12 +2,14 @@
 This module contains tools that can be used to check internet connection.
 As of v1.0.0, it relies on the subprocess library.
 """
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "MoonlightTaVi"
 
 
 from configparser import ConfigParser
+import os
 import platform
+import shutil
 import subprocess
 
 
@@ -16,6 +18,7 @@ class PingSubprocess:
 
     def __init__(self) -> None:
         """Creates an instance of object with the default settings."""
+        self.system_check() # Important!
         self.TIMEOUT: float = 5
         self.URL: str = "google.com"
 
@@ -46,3 +49,14 @@ class PingSubprocess:
         """Loads the settings preset from a config."""
         self.URL = config["WEB"]["server"]
         self.TIMEOUT = config.getfloat("WEB", "TIMEOUT")
+    
+    def system_check(self):
+        """Checks if the application can run on the current OS."""
+        # The app uses the system 'ping' util
+        full_path = shutil.which("ping")
+        # Which can be missing
+        if full_path is None:
+            raise OSError("You don't have a ping.exe utility in your OS!")
+        # Or the app may have the same name
+        if not os.path.isabs(full_path):
+            raise OSError("The application executable cannot be named 'ping.exe'")
