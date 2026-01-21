@@ -1,26 +1,43 @@
+"""
+Simple tools to interact with the command line from the code.
+"""
+
+from configparser import ConfigParser
 import os
 import time
 
 
-class Reboot:
+class ShellReboot:
     """Runs shell command to reboot the router."""
+
     def __init__(self) -> None:
         self.url = ""
         self.endpoint = ""
         self.username = "admin"
         self.password = "admin"
         self.message = 'Rebooting the router, wait ~1 minute...'
+
     def full_url(self) -> str:
         """Returns full URL to reboot endpoint."""
         return f'{self.url}/{self.endpoint}'
+    
     def get_auth(self) -> str:
         """Returns router credentials."""
         return f'{self.username}:{self.password}'
+    
     def get_command(self) -> str:
         """Returns command (tested on Windows)."""
         return f'curl -s -o nul --anyauth --user {self.get_auth()} -H "Referer: {self.url}" {self.full_url()}'
+    
     def exec(self):
         """Reboots the router and pauses the application."""
         print(self.message)
         os.system(self.get_command())
         time.sleep(10)
+
+    def load_config(self, config: ConfigParser):
+        """Loads the settings preset from a config."""
+        self.username = config["API"]["username"]
+        self.password = config["API"]["password"]
+        self.url = config["API"]["URL"]
+        self.endpoint = config["API"]["endpoint"]
