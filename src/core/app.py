@@ -2,11 +2,12 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 __author__ = "MoonlightTaVi"
 
 
 from configparser import ConfigParser
+import sys
 
 from .util.art import PingPongAnim, AsciiDrawer
 from .util import messages
@@ -23,9 +24,16 @@ class State:
         # Open browser after some number of fails in a row
         self.fail_count: int = 0
         self.max_fails: int = 5
+        # Reboot again if the connection isn't regained
+        #  after this number of failures
+        self.disconnect_threshold: int = 15
+        # Cannot reboot more than this number of times consequently
+        self.reboot_count: int = 0
+        self.max_reboots: int = 3 # Can't be changed in config
+
         # Do not open browser if already opened
         # Do not open unless succeeded at least once after startup
-        self.needs_reset: bool = False
+        self.disconnected: bool = False
 
     def can_reboot(self) -> bool:
         """
@@ -35,25 +43,44 @@ class State:
         (it may be a micro-disconnect or a complete connection loss).
         """
         self.fail_count += 1
-        if self.fail_count >= self.max_fails and not self.needs_reset:
-            self.needs_reset = True
+        if self.fail_count >= self.max_fails and not self.disconnected:
+            self.disconnected = True
             return True
         return False
+    
+    def can_reset(self) -> bool:
+        """
+        Returns True if the router can be tried to reboot once again.
+        
+        If the connection is completely lost, by default the app will try
+        to reboot yet 3 times until giving up completely.
+        """
+        return self.reboot_count < self.max_reboots
+    
+    def reset(self) -> None:
+        """
+        Resets the fail count and increments the reboot count, 
+        so that the app can try to reboot again.
+        """
+        self.reboot_count += 1
+        self.fail_count = 0
+        self.disconnected = False
     
     def succeed(self):
         """
         Marks the internet connection as 'stable'
         and resets the failure counter.
         """
+        self.reboot_count = 0
         self.fail_count = 0
-        self.needs_reset = False
+        self.disconnected = False
     
-    def connection_lost(self):
+    def is_connection_lost(self):
         """
         Returns true if the remote server 
         does not respond for a long time.
         """
-        return self.fail_count >= self.max_fails * 2
+        return self.fail_count >= self.disconnect_threshold
 
 
 class PingPong:
@@ -87,7 +114,8 @@ class PingPong:
         self.reboot.load_config(parser)
         self.ascii.load(self.config.ASCII_FILE)
         self.pong.update_time = self.config.UPDATE_TIME
-        self.state.max_fails = parser.getint('PREFERENCES', 'max_fail')
+        self.state.max_fails = self.config.MAX_FAILS
+        self.state.disconnect_threshold = self.config.DISCONNECT_THRESHOLD
 
     def run(self):
         """
@@ -111,14 +139,33 @@ class PingPong:
             
             # Try rebooting automatically
             if self.state.can_reboot():
+                # Open router page (basic mode)
                 if self.config.OPEN_BROWSER:
                     self.browser.start()
+                # Reboot via curl request (advanced mode)
                 elif self.config.REBOOT:
                     self.reboot.exec()
-            # Ask to reboot manually or quit
-            elif self.state.connection_lost():
-                self.idle_mode()
+            
+            # If the connection is completely lost
+            elif self.state.is_connection_lost():
+                # Whether to prompt to reboot manually
+                go_idle: bool = False
+                if self.config.FALLBACK_MODE == 1:
+                    go_idle = True
+                # Try to reboot automatically
+                elif self.config.FALLBACK_MODE == 2:
+                    # If can reset the reboot count, do it
+                    if self.state.can_reset():
+                        self.state.reset()
+                    # But can't do that eternally (switch to fallback mode 1)
+                    else:
+                        go_idle = True
+                # May ask user to reboot manually in any case
+                if go_idle:
+                    self.idle_mode()
+                # Or just do nothing... (keep pinging)
         
+        # Wait for some time, based on whether the connection is stable
         sleep: float
         if self.state.fail_count == 0:
             sleep = self.config.SLEEP_TIME
@@ -149,7 +196,10 @@ class PingPong:
                     continue
             # Give up
             else:
-                quit()
+                sys.exit()
 
-            # The internet connection is fixed
+            # The internet connection issue is fixed
             connection_established = True
+
+        # Mark the connection as stable
+        self.state.succeed()

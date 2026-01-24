@@ -1,7 +1,7 @@
 """
 Utilities for configuration file reading.
 """
-__version__ = "1.0.0"
+__version__ = "1.1.2"
 __author__ = "MoonlightTaVi"
 
 
@@ -35,9 +35,15 @@ class AppConfig:
         self.UPDATE_TIME: float = 20
         self.ASCII_ENABLED: bool = True
         self.MAX_FAILS: int = 5
+        self.DISCONNECT_THRESHOLD = 15
         self.OPEN_BROWSER: bool = True
         self.REBOOT: bool = False
         self.PING_URL: str = "google.com"
+        # Fallback is performed when the connection is completely lost
+        #  0 - Do nothing
+        #  1 - Pause and ask the user whether to reboot manually again
+        #  2 - Try to reboot automatically yet a couple of times, then pause
+        self.FALLBACK_MODE: int = 0
 
     def load_config(self, config: ConfigParser):
         """Reads the app configuration from a config parser object."""
@@ -50,6 +56,9 @@ class AppConfig:
         self.SLEEP_TIME = config.getfloat("PREFERENCES", "sleep")
         self.FAIL_SLEEP_TIME = config.getfloat("PREFERENCES", "fail_sleep")
         self.MAX_FAILS = config.getint("PREFERENCES","max_fail")
+        self.DISCONNECT_THRESHOLD = config.getint("PREFERENCES","disconnect_threshold")
         self.OPEN_BROWSER = config.getboolean("PREFERENCES", "open_browser")
+        self.FALLBACK_MODE = config.getint("PREFERENCES","fallback_mode")
+
         self.REBOOT = config.getboolean("API", "reboot")
 
