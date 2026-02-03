@@ -129,7 +129,7 @@ class PingPong:
         self.reboot = ShellReboot()
         self.state = State()
         self.stopwatch = Stopwatch()
-        self.pong = PingPongAnim()
+        self.animation = PingPongAnim()
         self.ascii = AsciiDrawer()
 
     def load_config(self):
@@ -144,7 +144,7 @@ class PingPong:
         self.process.load_config(parser)
         self.reboot.load_config(parser)
         self.ascii.load(self.config.ASCII_FILE)
-        self.pong.update_time = self.config.UPDATE_TIME
+        self.animation.update_time = self.config.UPDATE_TIME
         self.state.max_fails = self.config.MAX_FAILS
         self.state.disconnect_threshold = self.config.DISCONNECT_THRESHOLD
 
@@ -162,11 +162,14 @@ class PingPong:
         if self.process.ping():
             print(f"{self.process.URL} is reachable. ({self.stopwatch.click()}s)")
             self.state.succeed()
+            self.animation.blink = False # Stop blinking
 
         else:
             print(f"{self.process.URL} is unreachable. ({self.stopwatch.click()}s)")
             if self.config.ASCII_ENABLED:
                 self.ascii.draw(self.config.ASCII_FILE)
+            
+            self.animation.blink = True # Start blinking
             
             # Try rebooting automatically
             if self.state.can_reboot():
@@ -206,7 +209,8 @@ class PingPong:
         else:
             sleep = self.config.FAIL_SLEEP_TIME
         
-        self.pong.play(sleep)
+        # Play the Ping-Pong animation
+        self.animation.play(sleep)
     
     def idle_mode(self):
         """

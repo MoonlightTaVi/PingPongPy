@@ -1,7 +1,7 @@
 """
 Tools for command line GUI: ASCII graphics, simple idle animations, etc.
 """
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "MoonlightTaVi"
 
 
@@ -43,6 +43,7 @@ class AsciiDrawer:
 class PingPongAnim:
     """Used to pause app execution and play ping-pong animation."""
     state: int = 0
+    blink: bool = False
 
     def __init__(
             self, 
@@ -56,7 +57,11 @@ class PingPongAnim:
         return datetime.now().timestamp()
 
     def play(self, duration: float = 5):
-        """Pause execution and play ping-pong animation.
+        """
+        Pause execution and play ping-pong animation.
+
+        The 'blink' variable of the object may be optionally set to True
+        to enable color blinking.
         
         Parameters
         ----------
@@ -81,4 +86,12 @@ class PingPongAnim:
                 state = width - self.state % width
             left: str = "*" * state
             right: str = "*" * (width - state)
-            print("[" + left + "O" + right + "]", end='\r')
+            self.__print("[" + left + "O" + right + "]")
+    
+    def __print(self, text: str):
+        """Prints the animation to the console."""
+        # Blink every uneven frame (if enabled)
+        if self.blink and self.state % 2 == 1:
+            text = f'\u001B[93m{text}\u001B[0m'
+        
+        print(text, end='\r')
