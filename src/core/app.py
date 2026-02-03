@@ -2,7 +2,7 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 __author__ = "MoonlightTaVi"
 
 
@@ -16,6 +16,19 @@ from .tools.browser import BrowserPage
 from .tools.health import PingSubprocess
 from .tools.shell import ShellReboot
 from .config import ConfigReader, AppConfig
+
+
+def format_red(text: str) -> str:
+    """Colors the text RED (for the terminal output)."""
+    return f'\u001B[91m{text}\u001B[0m'
+
+def format_yellow(text: str) -> str:
+    """Colors the text YELLOW (for the terminal output)."""
+    return f'\u001B[93m{text}\u001B[0m'
+
+def format_green(text: str) -> str:
+    """Colors the text GREEN (for the terminal output)."""
+    return f'\u001B[92m{text}\u001B[0m'
 
 
 class State:
@@ -81,6 +94,24 @@ class State:
         does not respond for a long time.
         """
         return self.fail_count >= self.disconnect_threshold
+    
+    def __str__(self) -> str:
+        """Returns the current state, formatted to a string."""
+        # Defaults to 'connected'
+        state: str = format_green('[OK]')
+        threshold: int = self.max_fails
+        # Fatal disconnect
+        if self.fail_count > self.max_fails:
+            state = format_red('[DC]')
+            threshold = self.disconnect_threshold
+        # Micro disconnect
+        elif self.fail_count != 0:
+            state = format_yellow('[FAIL]')
+        
+        state = f'{state}: {self.fail_count}/{threshold}'
+        retry = f'[RETRY] {self.reboot_count}/{self.max_reboots}'
+
+        return '\n\t'.join(['<State>:', state, retry])
 
 
 class PingPong:
@@ -165,6 +196,9 @@ class PingPong:
                     self.idle_mode()
                 # Or just do nothing... (keep pinging)
         
+        # Print state
+        print(self.state)
+
         # Wait for some time, based on whether the connection is stable
         sleep: float
         if self.state.fail_count == 0:
