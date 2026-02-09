@@ -2,7 +2,7 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 __author__ = "MoonlightTaVi"
 
 
@@ -124,7 +124,6 @@ class PingPong:
         """Instantiates a new PingPong with the deafult configuration."""
         self.config = AppConfig()
         self.browser = BrowserPage()
-        self.page = BrowserPage()
         self.process = PingSubprocess()
         self.reboot = ShellReboot()
         self.state = State()
@@ -140,7 +139,6 @@ class PingPong:
         parser: ConfigParser = reader.get_config()
         self.config.load_config(parser)
         self.browser.load_config(parser)
-        self.page.load_config(parser)
         self.process.load_config(parser)
         self.reboot.load_config(parser)
         self.ascii.load(self.config.ASCII_FILE)
@@ -228,9 +226,10 @@ class PingPong:
         while not connection_established:
             # Reboot
             if messages.ask("Do you want to reboot again?"):
-                self.reboot.exec()
+                # Ping first (maybe re-established already?)
                 if not self.process.ping():
                     # Keep rebooting
+                    self.reboot.exec()
                     continue
             # Give up
             else:

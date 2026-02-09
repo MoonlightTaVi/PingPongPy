@@ -10,7 +10,7 @@ to quickly log in and reboot.
 The "optional" and "some" settings may be changed
 from the application.properties file.
 """
-__version__ = "3.1.0"
+__version__ = "3.1.1"
 __author__ = "MoonlightTaVi"
 
 
@@ -23,7 +23,6 @@ def show_logo():
     print('#' * 50)
     print(f"### PING-PONG v{__version__}")
     print(f"### \tby {__author__}")
-    #print(f"### \t\t*not sponsored by {PING_URL} ©")
     print('#' * 50)
     print()
 
@@ -39,7 +38,7 @@ def main():
 
     try:
         run()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt: # Ctrl+C quits the application
         print("[SHUTDOWN]")
     except Exception as e:
         print(f'[Uncaught exception] {e}')
