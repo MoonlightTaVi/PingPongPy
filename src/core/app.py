@@ -221,11 +221,13 @@ class PingPong:
         print(" and cannot be recovered.")
         print("From now on, you need to either reboot the router manually")
         print(" or just give up.")
+        print("Do you want to reboot again?")
+        print("(The reboot will happen only if the connection is still absent)")
 
         connection_established = False
         while not connection_established:
             # Reboot
-            if messages.ask("Do you want to reboot again?"):
+            if messages.ask("Continue?"):
                 # Ping first (maybe re-established already?)
                 if not self.process.ping():
                     # Keep rebooting
