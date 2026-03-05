@@ -10,11 +10,12 @@ to quickly log in and reboot.
 The "optional" and "some" settings may be changed
 from the application.properties file.
 """
-__version__ = "3.1.1"
+__version__ = "3.1.2"
 __author__ = "MoonlightTaVi"
 
 
 import multiprocessing
+import traceback
 
 from core.app import PingPong
 
@@ -38,10 +39,13 @@ def main():
 
     try:
         run()
-    except KeyboardInterrupt: # Ctrl+C quits the application
+    # Ctrl+C quits the application
+    # But it does not always work correctly
+    except KeyboardInterrupt:
         print("[SHUTDOWN]")
     except Exception as e:
         print(f'[Uncaught exception] {e}')
+        traceback.print_exception(e)
     
     input("Press Enter to quit...")
 
