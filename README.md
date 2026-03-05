@@ -32,6 +32,18 @@ the required authentification credentials along with it;
 - If the connection is not recovered after some time, the app may try rebooting
 the router again.
 
+# Compatibility
+
+The application is made using default Python modules (no external dependencies). It used system `curl` and `ping` utilities. If you have them, the application will work just fine.
+
+The releases page currently contains the following builds:
+- Windows (tested on Win 11);
+- Linux AMD64 (tested on Debian 13 Trixie);
+
+The Windows EXE may be started right-away. The Linux version contains a `create-shortcut.sh` shell script; run it inside the application's directory (the script must have the "execute" permission), and it will create a `.desktop` shortcut. Without this shortcut you need to run the executable from the terminal (it cannot be launched with a double click because it is a CLI).
+
+Note: The Windows and the Linux versions are different at the moment (v3.1.1 and v3.1.2 respectively); that doesn't really have any impact on the user experience (v3.1.2 simply prints the stack trace upon a crash).
+
 # Modes
 
 Not all Internet routers follow the same structure:
@@ -54,12 +66,11 @@ without performing any "recover" logic
 1. Your router credentials are safe to expose **as long as your router is not
 exposed to the WEB** (by default it isn't). 
 But the application uses it internally anyway.
-2. The application is made on Windows and **is designed for Windows**. It may
-work on UNIX, but I do not promise it; it wasn't tested. To run on Linux/MacOS,
-the binary must be compiled manually 
-(or you can simply run the `src/main.py` script).
-3. The executable may have any name, but it **cannot be named `ping.exe`**.
+2. The executable may have any name, but it **cannot be named `ping.exe`**.
 Thankfully, since v3.x.x the application won't start when it has such a name.
+3. `Ctrl+C` is a keybind to stop the application, but that does not work really well. It is better to simply close the terminal, the processes will be killed automatically.
+4. The application is multi-platform; if it doesn't work for some reason, you can manually compile the binary (or run the `main.py` script from the terminal or from your IDE). The compilation is a system-specific process.
+5. Even the manual compilation **does not guarantee** that the application will work flawlessly. In that case, the code must be adjusted.
 
 # Settings
 
@@ -88,7 +99,6 @@ Here are the most useful ones:
 
 - Since v3.x.x, the application can reboot the router **three times** in a row if the connection cannot be recovered easily. Afterwards, the user must manually type `y` to try rebooting again.
 - The application always checks the connection state first, and only then it starts the rebooting. Exception: the specified server may not respond even if the connection is otherwise stable. There is no way to set the second "fallback" option for a server (sorry).
-- Pressing `Ctrl+C` will quit the application. But pressing `Ctrl+C` two times will throw an exception, don't do that.
 
 # Contribution
 
