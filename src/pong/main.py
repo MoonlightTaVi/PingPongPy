@@ -17,7 +17,7 @@ __author__ = "MoonlightTaVi"
 import multiprocessing
 import traceback
 
-from core.app import PingPong
+from pong.core.app import PingPong
 
 
 def show_logo():
