@@ -1,10 +1,12 @@
 """
 Simple tools to interact with the command line from the code.
 """
+__version__ = "1.3.0"
+__author__ = "MoonlightTaVi"
+
 
 from configparser import ConfigParser
 import os
-import time
 
 
 class ShellReboot:
@@ -31,9 +33,7 @@ class ShellReboot:
     
     def exec(self):
         """Reboots the router and pauses the application."""
-        print(self.message)
         os.system(self.get_command())
-        time.sleep(10)
 
     def load_config(self, config: ConfigParser):
         """Loads the settings preset from a config."""
