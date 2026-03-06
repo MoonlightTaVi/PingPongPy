@@ -1,5 +1,5 @@
 A command line application that automatically reboots the router
-upon a WAN disconnect by running `curl` to the specified router page end-point.
+upon a WAN disconnect by making HTTP requests to the specified router page end-point.
 
 The settings may be configured to work in a number of different modes.
 
@@ -23,7 +23,7 @@ not just me.
 
 # How it works
 
-- The app `ping`s the specified server; when the server does not respond for
+- The app pings the specified server; when the server does not respond for
 some time, it launches the "recovering" process;
 - Each Internet router has its IP address; it also has some HTM end-point
 with a script that starts the router rebooting process;
@@ -34,15 +34,17 @@ the router again.
 
 # Compatibility
 
-The application is made using default Python modules (no external dependencies). It used system `curl` and `ping` utilities. If you have them, the application will work just fine.
+Since v3.2.X, the application uses the `requests` library to provide full
+portability support.
 
 The releases page currently contains the following builds:
 - Windows (tested on Win 11);
 - Linux AMD64 (tested on Debian 13 Trixie);
 
-The Windows EXE may be started right-away. The Linux version contains a `create-shortcut.sh` shell script; run it inside the application's directory (the script must have the "execute" permission), and it will create a `.desktop` shortcut. Without this shortcut you need to run the executable from the terminal (it cannot be launched with a double click because it is a CLI).
+The Windows EXE may be started right-away. The Linux version contains a `create-shortcut.sh` shell script; run it inside the application's directory (the script must have the "execute" permission), and it will create a `.desktop` shortcut. Without this shortcut you need to run the executable from the terminal (it cannot be launched with a double click because it is a CLI tool).
 
-Note: The Windows and the Linux versions are different at the moment (v3.1.1 and v3.1.2 respectively); that doesn't really have any impact on the user experience (v3.1.2 simply prints the stack trace upon a crash).
+Note: The Windows and the Linux versions are different at the moment; 
+that doesn't really have any impact on the user experience.
 
 # Modes
 
