@@ -2,7 +2,7 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 __author__ = "MoonlightTaVi"
 
 
@@ -13,8 +13,8 @@ from .util.art import PingPongAnim, AsciiDrawer
 from .util import messages
 from .util.metrics import Stopwatch
 from .tools.browser import BrowserPage
-from .tools.health import PingSubprocess
-from .tools.shell import ShellReboot
+from .tools.health import PingUtil, PingSubprocess, PingRequest
+from .tools.reboot import RebootUtil, ShellRebootAdapter
 from .config import ConfigReader, AppConfig
 
 
@@ -124,8 +124,9 @@ class PingPong:
         """Instantiates a new PingPong with the deafult configuration."""
         self.config = AppConfig()
         self.browser = BrowserPage()
-        self.process = PingSubprocess()
-        self.reboot = ShellReboot()
+        #self.process: PingUtil = PingSubprocess()
+        self.process: PingUtil = PingRequest()
+        self.reboot: RebootUtil = ShellRebootAdapter()
         self.state = State()
         self.stopwatch = Stopwatch()
         self.animation = PingPongAnim()
@@ -176,7 +177,7 @@ class PingPong:
                     self.browser.start()
                 # Reboot via curl request (advanced mode)
                 elif self.config.REBOOT:
-                    self.reboot.exec()
+                    self.reboot.start()
             
             # If the connection is completely lost
             elif self.state.is_connection_lost():
@@ -231,7 +232,7 @@ class PingPong:
                 # Ping first (maybe re-established already?)
                 if not self.process.ping():
                     # Keep rebooting
-                    self.reboot.exec()
+                    self.reboot.start()
                     continue
             # Give up
             else:

@@ -10,7 +10,7 @@ to quickly log in and reboot.
 The "optional" and "some" settings may be changed
 from the application.properties file.
 """
-__version__ = "3.1.2"
+__version__ = "3.2.0"
 __author__ = "MoonlightTaVi"
 
 
