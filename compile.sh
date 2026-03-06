@@ -1,1 +1,1 @@
-pyinstaller --onefile src/main.py --name=pong
+pyinstaller --onefile src/pong/main.py --name=pong
