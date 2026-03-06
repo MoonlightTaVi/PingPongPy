@@ -2,7 +2,7 @@
 Base Ping-Pong application classes that manage the whole life cycle
 of the programm.
 """
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 __author__ = "MoonlightTaVi"
 
 
@@ -13,8 +13,8 @@ from .util.art import PingPongAnim, AsciiDrawer
 from .util import messages
 from .util.metrics import Stopwatch
 from .tools.browser import BrowserPage
-from .tools.health import PingUtil, PingSubprocess, PingRequest
-from .tools.reboot import RebootUtil, ShellRebootAdapter
+from .tools.health import PingUtil, PingSubprocess
+from .tools.reboot import RebootUtil, RequestReboot
 from .config import ConfigReader, AppConfig
 
 
@@ -124,9 +124,13 @@ class PingPong:
         """Instantiates a new PingPong with the deafult configuration."""
         self.config = AppConfig()
         self.browser = BrowserPage()
-        #self.process: PingUtil = PingSubprocess()
-        self.process: PingUtil = PingRequest()
-        self.reboot: RebootUtil = ShellRebootAdapter()
+        # The ping subprocess does not require root access (Linux)
+        # The 'pythonping' library DOES require it
+        # The 'ping' command is faster than an HTTP GET
+        # HTTP GET may also throw exceptions because of that
+        self.process: PingUtil = PingSubprocess()
+        # But an HTTP GET is good for rebooting
+        self.reboot: RebootUtil = RequestReboot()
         self.state = State()
         self.stopwatch = Stopwatch()
         self.animation = PingPongAnim()
